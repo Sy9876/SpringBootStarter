@@ -1,4 +1,4 @@
-package cn.sy.dao;
+package cn.sy.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
