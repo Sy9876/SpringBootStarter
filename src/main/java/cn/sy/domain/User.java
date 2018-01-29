@@ -1,10 +1,10 @@
 package cn.sy.domain;
 
 public class User {
-	private String id;
-	private String name;
-	private String status;
-	private String password;
+	protected String id;
+	protected String name;
+	protected String status;
+	protected String password;
 	
 	public User(String id, String name, String status, String password) {
 		super();
