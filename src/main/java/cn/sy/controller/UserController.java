@@ -3,6 +3,12 @@ package cn.sy.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,6 +25,47 @@ public class UserController {
 	@Autowired
 	private UserDao userDao;
 
+	@Autowired
+	AuthenticationManager auth;
+	
+    @ResponseBody
+    @RequestMapping("/login.do")
+    public User login(
+			@RequestParam(value="name", required=true) String name,
+			@RequestParam(value="password", required=true) String password) {
+    	
+    	User user = null;
+
+    	logger.info("login.do start. name=" + name + " password=" + password);
+    	try {
+    		user=userDao.findByName(name);
+    		
+    		try {
+	    		Authentication request = new UsernamePasswordAuthenticationToken(name, password);
+	    		logger.info("login.do", request);
+	    		Authentication result = auth.authenticate(request);
+	    		logger.info("login.do", result);
+	    		SecurityContextHolder.getContext().setAuthentication(result);
+
+			} catch(AuthenticationException e) {
+				System.out.println("Authentication failed: " + e.getMessage());
+				throw e;
+    		}
+
+    		System.out.println("Successfully authenticated. Security context contains: " +
+    		SecurityContextHolder.getContext().getAuthentication());
+
+
+
+    		logger.info("login.do", user);
+		} catch (Exception e) {
+			logger.error("login.do", e);
+			throw e;
+		}
+    	logger.info("login.do end");
+    	return user;
+    }
+    
     @ResponseBody
     @RequestMapping("/user.do")
     public User greeting(
@@ -35,6 +82,7 @@ public class UserController {
 		} catch (Exception e) {
 //			e.printStackTrace();
 			logger.error("user.do", e);
+			throw e;
 		}
 //    	System.out.println("user end");
     	logger.info("user.do end");
@@ -45,7 +93,10 @@ public class UserController {
     @RequestMapping("/void.do")
     public void empty() {
 
-//    	System.out.println("void.do start.");
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	logger.info("void.do principal: " + authentication.isAuthenticated());
+    	logger.info("void.do user: " + authentication.getName());
+    	//    	System.out.println("void.do start.");
     	logger.info("void.do end");
     }
     
