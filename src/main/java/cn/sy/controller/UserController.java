@@ -9,9 +9,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.sy.dao.UserDao;
@@ -137,5 +139,38 @@ public class UserController {
 //    	System.out.println("insert end");
     	logger.info("insert.do end");
     	return cnt;
+    }
+    
+    @ExceptionHandler(value=Exception.class)
+    @ResponseStatus
+    public ErrorRespBody handleError(Exception ex) {
+    	return new ErrorRespBody(1001, "ERROR: " + ex.getMessage());
+    }
+    
+    private class ErrorRespBody {
+    	private int code;
+    	private String message;
+		public int getCode() {
+			return code;
+		}
+		public void setCode(int code) {
+			this.code = code;
+		}
+		public String getMessage() {
+			return message;
+		}
+		public void setMessage(String message) {
+			this.message = message;
+		}
+		public ErrorRespBody() {
+			
+		}
+		public ErrorRespBody(int code, String message) {
+			super();
+			this.code = code;
+			this.message = message;
+		}
+    	
+    	
     }
 }

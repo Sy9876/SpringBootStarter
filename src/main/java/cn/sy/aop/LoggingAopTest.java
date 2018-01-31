@@ -12,7 +12,7 @@ public class LoggingAopTest {
 	private static Logger logger = Logger.getLogger(LoggingAopTest.class);
 
 	@Around("execution(* cn.sy.controller.UserController.*(..))")
-	public Object logServiceAccess(ProceedingJoinPoint joinPoint) {
+	public Object logServiceAccess(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object rtn = null;
 		try {
 //			System.out.println("LoggingAopTest start: " + joinPoint);
@@ -38,6 +38,7 @@ public class LoggingAopTest {
 //			System.out.println("LoggingAopTest failed: " + joinPoint);
 			logger.error(e);
 			logger.info("LoggingAopTest failed: " + joinPoint);
+			throw e;
 		}
 		
 		return rtn;
