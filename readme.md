@@ -44,5 +44,8 @@ set C=curl -i --cookie cookiejar.txt --cookie-jar cookiejar.txt -H "Accept: appl
 
 %C% "http://localhost:8080/count.do"
 
+%C%  "http://localhost:8080/user.do?name=sy"
+
+
 ```
 

@@ -41,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         	.authorizeRequests()
 	        .antMatchers("/void.do", "/login.do").permitAll()
 	        .antMatchers("/count.do").authenticated()
+	        .antMatchers("/user.do").hasRole("USER")
+	        .antMatchers("/insert.do").hasRole("ADMIN")
 //	        .antMatchers("/**").permitAll()
 	        .anyRequest().authenticated()
 //                .and().formLogin().loginPage("/login").failureUrl("/login?error").permitAll().and()
