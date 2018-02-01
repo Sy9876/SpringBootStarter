@@ -35,6 +35,10 @@ public class UserDao implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		logger.info("username: " + username);
 		User user = findByName(username);
+		if(user==null) {
+			logger.info("throw new UsernameNotFoundException username: " + username);
+			throw new UsernameNotFoundException(username);
+		}
 		return new MyUserDetails(user);
 	}
 }

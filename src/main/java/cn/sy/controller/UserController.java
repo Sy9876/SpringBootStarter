@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.sy.dao.UserDao;
+import cn.sy.domain.MyUserDetails;
 import cn.sy.domain.User;
 
 
@@ -54,10 +56,25 @@ public class UserController {
 				throw e;
     		}
 
+    		Authentication a = SecurityContextHolder.getContext().getAuthentication();
     		System.out.println("Successfully authenticated. Security context contains: " +
-    		SecurityContextHolder.getContext().getAuthentication());
+    		a);
 
+    		MyUserDetails d = (MyUserDetails)a.getDetails();
+    		System.out.println("Successfully authenticated. getDetails: " + d);
 
+    		MyUserDetails p = (MyUserDetails)a.getPrincipal();
+    		System.out.println("Successfully authenticated. getPrincipal: " + p);
+    		
+    		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    		String username = null;
+    		if (principal instanceof UserDetails) {
+    			username = ((UserDetails)principal).getUsername();
+    			
+    		} else {
+    			username = principal.toString();
+    		}
+    		System.out.println("Successfully authenticated. username: " + username);
 
     		logger.info("login.do", user);
 		} catch (Exception e) {
