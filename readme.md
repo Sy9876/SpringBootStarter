@@ -35,7 +35,8 @@ insert into user values ('1', 'sy', 'shenyue', '1');
 
 
 ``` bat
-set C=curl -i --cookie-jar cookiejar.txt -H "Accept: application/json" -H "X-Requested-With: XMLHttpRequest"
+set OPTS=-v 
+set C=curl -i --cookie cookiejar.txt --cookie-jar cookiejar.txt -H "Accept: application/json" -H "X-Requested-With: XMLHttpRequest"
 
 %C% "http://localhost:8080/void.do"
 
