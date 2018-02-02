@@ -46,6 +46,20 @@ set C=curl -i --cookie cookiejar.txt --cookie-jar cookiejar.txt -H "Accept: appl
 
 %C%  "http://localhost:8080/user.do?name=sy"
 
-
 ```
 
+## REST API present sessionid in X-Auth-Token
+
+``` bat
+
+set CX=curl -i -H "Accept: application/json" -H "X-Requested-With: XMLHttpRequest"
+
+%CX% "http://localhost:8080/void.do"
+
+%CX% "http://localhost:8080/login.do?name=sy&password=shenyue"
+
+%CX% "http://localhost:8080/count.do" -H "X-Auth-Token: xxx"
+
+%CX%  "http://localhost:8080/user.do?name=sy"
+
+```
