@@ -19,15 +19,11 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
  		<package name="cn.sy.domain"/>  
   	</typeAliases>	
   	
-	<!--
+	<!-- xml config do not work in spring mybatis. need java config for @Bean DatabaseIdProvider
  	<databaseIdProvider type="DB_VENDOR">
 		<property name="SQL Server" value="sqlserver" />
 		<property name="MySQL" value="mysql" />
 	</databaseIdProvider>-->
-    <databaseIdProvider type="DB_VENDOR">
-        <property name="MySQL" value="mysql" />
-        <property name="SQL Server" value="sqlserver" />
-    </databaseIdProvider>
     
   	<mappers>      
 	  <mapper resource="cn/sy/mapper/UserMapper.xml" />
