@@ -22,6 +22,9 @@ public class MyUserDetails extends User implements UserDetails {
 	private final String AccountExpired = "2";
 	private final String AccountLocked = "3";
 
+	public MyUserDetails() {
+		super();
+	}
 	public MyUserDetails(String id, String name, String status, String password) {
 		super(id, name, status, password);
 	}

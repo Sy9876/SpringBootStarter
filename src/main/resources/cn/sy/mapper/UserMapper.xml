@@ -3,12 +3,19 @@
 <mapper namespace="cn.sy.mapper.UserMapper">
 
 	<!-- 查询 -->
-	<select id="findByName" resultType="User" parameterType="String">
+	<select id="findByName" resultType="User" parameterType="String" > <!-- databaseId="sqlserver" -->
 		SELECT id, name, status, password 
-		FROM user 
+		FROM [user] 
 		WHERE name = #{name}
 	</select>
-
+	<!-- 
+	<select id="findByName" resultType="User" parameterType="String">
+		SELECT id, name, status, password 
+		FROM user
+		WHERE name = #{name}
+	</select>
+	-->
+	
 	<select id="count" resultType="Integer" parameterType="String">
 		SELECT count(1) 
 		FROM user 

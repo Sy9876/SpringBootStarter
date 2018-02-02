@@ -1,5 +1,10 @@
 package cn.sy.dao;
 
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +24,19 @@ public class UserDao implements UserDetailsService {
 	@Autowired
 	private UserMapper userMapper;
 	
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
+	@Autowired
+	private DataSource ds;
+	
 	public User findByName(String name) {
+		try {
+			logger.info("getDatabaseProductName: " + ds.getConnection().getMetaData().getDatabaseProductName());
+			logger.info("getDatabaseId: " + sqlSessionFactory.getConfiguration().getDatabaseId());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return userMapper.findByName(name);
 	}
 	

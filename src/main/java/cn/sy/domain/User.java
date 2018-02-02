@@ -6,6 +6,9 @@ public class User {
 	protected String status;
 	protected String password;
 	
+	public User() {
+		
+	}
 	public User(String id, String name, String status, String password) {
 		super();
 		this.id = id;
