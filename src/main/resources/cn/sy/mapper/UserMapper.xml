@@ -16,11 +16,19 @@
 	</select>
 	
 	
+	<select id="count" resultType="Integer" parameterType="String" databaseId="sqlserver">
+		SELECT count(1) 
+		FROM [user] 
+	</select>
 	<select id="count" resultType="Integer" parameterType="String">
 		SELECT count(1) 
 		FROM user 
 	</select>
 
+	<insert id="insert" parameterType="User" databaseId="sqlserver">
+		insert into [user] (id, name, status, password) 
+		values (#{id}, #{name}, #{status}, #{password})
+	</insert>
 	<insert id="insert" parameterType="User">
 		insert into user (id, name, status, password) 
 		values (#{id}, #{name}, #{status}, #{password})
