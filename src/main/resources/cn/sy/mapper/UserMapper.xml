@@ -34,4 +34,16 @@
 		values (#{id}, #{name}, #{status}, #{password})
 	</insert>
 
+
+	<select id="findMenusByName" resultType="map" parameterType="String">
+		select distinct mr.name as roleName, mm.name as menuName, mm.url as menuUrl
+		from [user] u
+		join my_user_role mur on mur.user_id=u.id 
+		join my_role mr on mr.id =mur.role_id
+		join my_menu_role mmr on mmr.role_id=mr.id
+		join my_menu mm on mm.id=mmr.menu_id
+		WHERE u.name = #{name}
+	</select>
+	
+	
 </mapper>

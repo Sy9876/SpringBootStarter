@@ -1,6 +1,8 @@
 package cn.sy.dao;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -56,6 +58,20 @@ public class UserDao implements UserDetailsService {
 			logger.info("throw new UsernameNotFoundException username: " + username);
 			throw new UsernameNotFoundException(username);
 		}
-		return new MyUserDetails(user);
+		MyUserDetails myUserDetails = new MyUserDetails(user);
+		
+		myUserDetails.setMenus(findMenusByName(username));
+		
+		return myUserDetails;
 	}
+	
+	public List<Map<String, String>> findMenusByName(String name) {
+		List<Map<String, String>> menus = null;
+		logger.info("findMenusByName: " + name);
+		menus =  userMapper.findMenusByName(name);
+		
+		return menus;
+	}
+	
+
 }

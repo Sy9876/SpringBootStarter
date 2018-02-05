@@ -1,5 +1,8 @@
 package cn.sy.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,6 @@ public class UserController {
 	@Autowired
 	AuthenticationManager auth;
 	
-    @ResponseBody
     @RequestMapping("/login.do")
     public User login(
 			@RequestParam(value="name", required=true) String name,
@@ -85,7 +87,6 @@ public class UserController {
     	return user;
     }
     
-    @ResponseBody
     @RequestMapping("/user.do")
     public User greeting(
 			@RequestParam(value="name", required=true) String name) {
@@ -108,7 +109,6 @@ public class UserController {
     	return user;
     }
 
-    @ResponseBody
     @RequestMapping("/void.do")
     public void empty() {
 
@@ -119,12 +119,11 @@ public class UserController {
     	logger.info("void.do end");
     }
     
-    @ResponseBody
     @RequestMapping("/count.do")
     public int count() {
     	int cnt=0;
 //    	System.out.println("count.do start.");
-    	logger.info("count.do end");
+    	logger.info("count.do start");
     	try {
     		cnt=userDao.count();
 //    		System.out.println(cnt);
@@ -138,8 +137,23 @@ public class UserController {
     	return cnt;
     }
 
-    
-    @ResponseBody
+    @RequestMapping("/menus.do")
+    public List<Map<String, String>> menus(@RequestParam(value="name", required=true) String name) {
+    	List<Map<String, String>> menus = null;
+
+    	logger.info("menus.do start");
+    	try {
+    		menus=userDao.findMenusByName(name);
+//    		logger.info("menus.do ");
+		} catch (Exception e) {
+
+			logger.error("menus.do ", e);
+		}
+
+    	logger.info("menus.do end");
+    	return menus;
+    }
+
     @RequestMapping("/insert.do")
     public int insert() {
     	int cnt=0;

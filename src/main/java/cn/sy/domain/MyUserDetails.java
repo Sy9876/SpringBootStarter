@@ -3,14 +3,19 @@ package cn.sy.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 public class MyUserDetails extends User implements UserDetails {
 
+	private static Logger logger = LoggerFactory.getLogger(MyUserDetails.class);
 	
 	/**
 	 * 
@@ -21,6 +26,8 @@ public class MyUserDetails extends User implements UserDetails {
 	private final String AccountDisabled = "0";
 	private final String AccountExpired = "2";
 	private final String AccountLocked = "3";
+	
+	List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 
 	public MyUserDetails() {
 		super();
@@ -35,15 +42,26 @@ public class MyUserDetails extends User implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 		
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+//		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		
 		return authorities;
 	}
 
+	public void setAuthorities(List<SimpleGrantedAuthority> authorities) {
+		this.authorities = authorities;
+	}
+	
+	public void setMenus(List<Map<String, String>> menus) {
+		for(Map<String, String> menu : menus) {
+			String authorityName = "ROLE_" + menu.get("menuName");
+			logger.info("setMenus  menuName=" + authorityName);
+			authorities.add(new SimpleGrantedAuthority(authorityName));
+		}
+	}
+	
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
 		return this.name;
 	}
 
