@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import cn.sy.dao.UserDao;
-import cn.sy.domain.MyUserDetails;
+//
+//import cn.sy.dao.UserDao;
+//import cn.sy.domain.MyUserDetails;
 import cn.sy.domain.User;
 
 
@@ -29,8 +29,8 @@ import cn.sy.domain.User;
 public class UserController {
 	private static Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	@Autowired
-	private UserDao userDao;
+//	@Autowired
+//	private UserDao userDao;
 
 	@Autowired
 	AuthenticationManager auth;
@@ -44,7 +44,7 @@ public class UserController {
 
     	logger.info("login.do start. name=" + name + " password=" + password);
     	try {
-    		user=userDao.findByName(name);
+//    		user=userDao.findByName(name);
     		
     		try {
 	    		Authentication request = new UsernamePasswordAuthenticationToken(name, password);
@@ -62,12 +62,12 @@ public class UserController {
     		System.out.println("Successfully authenticated. Security context contains: " +
     		a);
 
-    		MyUserDetails d = (MyUserDetails)a.getDetails();
-    		System.out.println("Successfully authenticated. getDetails: " + d);
-
-    		MyUserDetails p = (MyUserDetails)a.getPrincipal();
-    		System.out.println("Successfully authenticated. getPrincipal: " + p);
-    		
+//    		MyUserDetails d = (MyUserDetails)a.getDetails();
+//    		System.out.println("Successfully authenticated. getDetails: " + d);
+//
+//    		MyUserDetails p = (MyUserDetails)a.getPrincipal();
+//    		System.out.println("Successfully authenticated. getPrincipal: " + p);
+//    		
     		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     		String username = null;
     		if (principal instanceof UserDetails) {
@@ -96,7 +96,7 @@ public class UserController {
 //    	System.out.println("user start. name=" + name);
     	logger.info("user.do start. name=" + name);
     	try {
-    		user=userDao.findByName(name);
+//    		user=userDao.findByName(name);
 //    		System.out.println(user);
     		logger.info("user.do", user);
 		} catch (Exception e) {
@@ -125,7 +125,7 @@ public class UserController {
 //    	System.out.println("count.do start.");
     	logger.info("count.do start");
     	try {
-    		cnt=userDao.count();
+//    		cnt=userDao.count();
 //    		System.out.println(cnt);
     		logger.info("count.do ", cnt);
 		} catch (Exception e) {
@@ -143,7 +143,7 @@ public class UserController {
 
     	logger.info("menus.do start");
     	try {
-    		menus=userDao.findMenusByName(name);
+//    		menus=userDao.findMenusByName(name);
 //    		logger.info("menus.do ");
 		} catch (Exception e) {
 
@@ -160,7 +160,7 @@ public class UserController {
 //    	System.out.println("insert.do start.");
     	logger.info("insert.do start");
     	try {
-    		cnt=userDao.insert(new User("1", "admin", "1", "password"));
+//    		cnt=userDao.insert(new User("1", "admin", "1", "password"));
 //    		System.out.println(cnt);
     		logger.info("insert.do ", cnt);
 		} catch (Exception e) {
