@@ -1,8 +1,16 @@
 package cn.sy.controller;
 
+import java.security.Principal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,8 +26,51 @@ public class UserController {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private AuthenticationManager authManager;
 
-    @ResponseBody
+    @RequestMapping("/login.do")
+    public Authentication login(
+			@RequestParam(value="name", required=true) String name,
+			@RequestParam(value="password", required=true) String password) throws Exception {
+    	Authentication auth = null;
+    	logger.info("login.do start. name=" + name);
+    	try {
+    		auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(name, password));
+    		SecurityContextHolder.getContext().setAuthentication(auth);
+    		logger.info("login.do", auth);
+		} catch (Exception e) {
+			logger.error("login.do", e);
+			throw e;
+		}
+
+    	logger.info("login.do end");
+    	return auth;
+    }
+    
+    @RequestMapping("/whoami.do")
+    public UserDetails whoami() throws Exception {
+    	UserDetails principal = null;
+    	try {
+    		Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    		if(o instanceof UserDetails) {
+    			principal=(UserDetails)o;
+    		}
+    		logger.info("whoami.do", principal);
+		} catch (Exception e) {
+			logger.error("whoami.do", e);
+			throw e;
+		}
+
+    	logger.info("whoami.do end");
+    	return principal;
+    }
+    
+    
     @RequestMapping("/user.do")
     public User greeting(
 			@RequestParam(value="name", required=true) String name) {
@@ -41,7 +92,6 @@ public class UserController {
     	return user;
     }
 
-    @ResponseBody
     @RequestMapping("/void.do")
     public void empty() {
 
@@ -49,7 +99,6 @@ public class UserController {
     	logger.info("void.do end");
     }
     
-    @ResponseBody
     @RequestMapping("/count.do")
     public int count() {
     	int cnt=0;
