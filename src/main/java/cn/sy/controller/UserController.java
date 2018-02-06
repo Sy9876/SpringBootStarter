@@ -87,6 +87,24 @@ public class UserController {
     	return user;
     }
     
+    @RequestMapping("/whoami.do")
+    public UserDetails whoami() throws Exception {
+    	UserDetails principal = null;
+    	try {
+    		Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    		if(o instanceof UserDetails) {
+    			principal=(UserDetails)o;
+    		}
+    		logger.info("whoami.do", principal);
+		} catch (Exception e) {
+			logger.error("whoami.do", e);
+			throw e;
+		}
+
+    	logger.info("whoami.do end");
+    	return principal;
+    }
+    
     @RequestMapping("/user.do")
     public User greeting(
 			@RequestParam(value="name", required=true) String name) {
