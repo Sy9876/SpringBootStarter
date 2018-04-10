@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.sy.dao.UserDao;
 import cn.sy.domain.User;
+import cn.sy.ws.client.MyWsClient;
 
 
 @RestController
@@ -45,6 +46,8 @@ public class UserController {
     @RequestMapping("/void.do")
     public void empty() {
 
+    	MyWsClient.invoke();
+    	
 //    	System.out.println("void.do start.");
     	logger.info("void.do end");
     }
