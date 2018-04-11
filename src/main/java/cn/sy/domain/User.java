@@ -1,11 +1,27 @@
 package cn.sy.domain;
 
-public class User {
+import java.io.Serializable;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class User implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4914565329133414543L;
 	private String id;
+	@NotNull(message="NN")
 	private String name;
+	@Digits(fraction = 0, integer = 1)
 	private String status;
+	@Size(min=6, max=15)
 	private String password;
 	
+	public User() {
+		
+	}
 	public User(String id, String name, String status, String password) {
 		super();
 		this.id = id;

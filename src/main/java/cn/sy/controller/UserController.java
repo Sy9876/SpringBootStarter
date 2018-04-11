@@ -1,14 +1,20 @@
 package cn.sy.controller;
 
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.sy.dao.UserDao;
 import cn.sy.domain.User;
 
 
@@ -16,27 +22,22 @@ import cn.sy.domain.User;
 public class UserController {
 	private static Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	@Autowired
-	private UserDao userDao;
-
     @ResponseBody
     @RequestMapping("/user.do")
     public User greeting(
-			@RequestParam(value="name", required=true) String name) {
+    		@RequestParam(value="name", required=true) String name) {
     	
     	User user = null;
-    	
-//    	System.out.println("user start. name=" + name);
+
     	logger.info("user.do start. name=" + name);
     	try {
-    		user=userDao.findByName(name);
-//    		System.out.println(user);
+    		
     		logger.info("user.do", user);
 		} catch (Exception e) {
-//			e.printStackTrace();
+
 			logger.error("user.do", e);
 		}
-//    	System.out.println("user end");
+
     	logger.info("user.do end");
     	return user;
     }
@@ -45,45 +46,33 @@ public class UserController {
     @RequestMapping("/void.do")
     public void empty() {
 
-//    	System.out.println("void.do start.");
+
     	logger.info("void.do end");
     }
-    
-    @ResponseBody
-    @RequestMapping("/count.do")
-    public int count() {
-    	int cnt=0;
-//    	System.out.println("count.do start.");
-    	logger.info("count.do end");
-    	try {
-    		cnt=userDao.count();
-//    		System.out.println(cnt);
-    		logger.info("count.do ", cnt);
-		} catch (Exception e) {
-//			e.printStackTrace();
-			logger.error("count.do ", e);
-		}
-//    	System.out.println("count.do end");
-    	logger.info("count.do end");
-    	return cnt;
-    }
-
-    
+        
+    // curl -i --silent -X POST http://localhost:8080/insert.do --data "{"""id""":"""test3""","""name""":null,"""status""":1,"""password""":"""123456"""}"  -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Requested-With: XMLHttpRequest"
     @ResponseBody
     @RequestMapping("/insert.do")
-    public int insert() {
+    public int insert(@Valid @RequestBody User user, BindingResult result) {
     	int cnt=0;
-//    	System.out.println("insert.do start.");
+
     	logger.info("insert.do start");
     	try {
-    		cnt=userDao.insert(new User("1", "admin", "1", "password"));
-//    		System.out.println(cnt);
+//    		User user = new User("1", "admin", "1", "password");
+
+    		if (result.hasErrors()){
+                List<ObjectError> errorList = result.getAllErrors();
+                for(ObjectError error : errorList){
+                	logger.info(error.toString());
+                }
+            }
+
     		logger.info("insert.do ", cnt);
 		} catch (Exception e) {
-//			e.printStackTrace();
+
 			logger.error("insert.do ", e);
 		}
-//    	System.out.println("insert end");
+
     	logger.info("insert.do end");
     	return cnt;
     }
