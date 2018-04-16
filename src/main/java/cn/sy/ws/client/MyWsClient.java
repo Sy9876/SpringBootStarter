@@ -7,7 +7,15 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.Message;
+
+import cn.sy.ws.interceptor.MySoapInInterceptor;
 
 public class MyWsClient {
 	/*
@@ -48,14 +56,25 @@ public class MyWsClient {
 			QName serviceName = new QName("http://WebXml.com.cn/", "WeatherWS");
 			QName portName = new QName("http://WebXml.com.cn/", "WeatherWSSoap");
 			String addr = "http://ws.webxml.com.cn/WebServices/WeatherWS.asmx";
-//			String addr = "http://localhost:8088/mockWeatherWSSoap";
-			Service sv = Service.create(new URL(addr + "?wsdl"), serviceName);
+
+			// 如果SEI中指定了wsdlLocation，这里就不需要传入wsdl地址
+//			Service sv = Service.create(new URL(addr + "?wsdl"), serviceName);
+			Service sv = Service.create(serviceName);
 			sv.addPort(portName, SOAPBinding.SOAP12HTTP_BINDING, addr);
 			
 			WsSEI proxy = sv.getPort(WsSEI.class);
 			
 		    System.out.println("got sv");
 //		    List<String> result = sv.getWeatherbyCityName("北京");
+		    
+		    Client client = ClientProxy.getClient(proxy);
+		    Interceptor interceptor = null;
+		    interceptor = new LoggingOutInterceptor();
+//		    interceptor = new MySoapInInterceptor();
+//		    String sh = null;
+//		    interceptor = new StaxOutEndingInterceptor(sh);
+		    client.getOutInterceptors().add(interceptor);
+		    
 		    
 		    GetSupportCityStringSoapIn in = new GetSupportCityStringSoapIn();
 //		    in.setTheRegionCode("311101");
