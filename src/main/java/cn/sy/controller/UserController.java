@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -34,6 +35,9 @@ public class UserController {
 
 	@Autowired
 	AuthenticationManager auth;
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
     @RequestMapping("/login.do")
     public User login(
@@ -116,6 +120,17 @@ public class UserController {
     	logger.info("void.do principal: " + authentication.isAuthenticated());
     	logger.info("void.do user: " + authentication.getName());
     	//    	System.out.println("void.do start.");
+    	
+    	String k = "myKey";
+    	String v = null;
+    	v = redisTemplate.opsForValue().get(k);
+    	if(v!=null) {
+    		v=v+".";
+    	}
+    	else {
+    		v=".";
+    	}
+    	redisTemplate.opsForValue().set(k, v);
     	logger.info("void.do end");
     }
     
