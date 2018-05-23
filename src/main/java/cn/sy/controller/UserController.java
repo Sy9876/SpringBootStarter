@@ -1,15 +1,21 @@
 package cn.sy.controller;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.support.collections.DefaultRedisMap;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +42,23 @@ public class UserController {
 	AuthenticationManager auth;
 	
 	@Autowired
-	private StringRedisTemplate redisTemplate;
+	private StringRedisTemplate stringRedisTemplate;
+	
+	@Resource(name="stringRedisTemplate")
+	private HashOperations<String, String, String> hashOps;
+	
+	// 实现了ConcurrentMap<K,V>，线程安全。每次get都从redis查询，性能有问题？
+	DefaultRedisMap<String, String> redisRoutingMap;
+	
+//	private RedisOperations<String, String> redisOperations;
+	
+	// 使用@PostConstruct在stringRedisTemplate被注入之后执行redisRoutingMap的初始化
+	@PostConstruct
+	public void init() {
+		logger.info("PostConstruct. init redisRoutingMap");
+		String k = "shardRule:shop";
+		redisRoutingMap = new DefaultRedisMap<>(k, stringRedisTemplate);
+	}
 	
     @RequestMapping("/login.do")
     public User login(
@@ -91,7 +112,8 @@ public class UserController {
     	return user;
     }
     
-    @RequestMapping("/user.do")
+
+	@RequestMapping("/user.do")
     public User greeting(
 			@RequestParam(value="name", required=true) String name) {
     	
@@ -113,7 +135,53 @@ public class UserController {
     	return user;
     }
 
-    @RequestMapping("/void.do")
+    
+	// set，get操作
+    private void redisValueTest() {
+    	String k = "myKey";
+    	String v = null;
+    	v = stringRedisTemplate.opsForValue().get(k);
+    	if(v!=null) {
+    		v=v+".";
+    	}
+    	else {
+    		v=".";
+    	}
+    	stringRedisTemplate.opsForValue().set(k, v);
+    }
+    
+    // 使用spring data redis 提供的帮助类DefaultRedisMap实现hash操作
+    private void redisHashTest() {
+    	
+    	String kk = null;
+    	String v = null;
+
+    	for(int i=0;i<10;i++) {
+    		kk = "shop_" + i;
+    		v = "" + i%10;
+    		redisRoutingMap.put(kk, v);
+    	}
+    	
+
+    }
+    
+	// dump hash
+    private void redisHashTest2() {
+
+    	String kk = null;
+    	String v = null;
+
+    	logger.info("redisHashTest2. redisRoutingMap.size=" + redisRoutingMap.size());
+    	Set<String> ks = redisRoutingMap.keySet();
+    	Iterator<String> i = ks.iterator();
+    	while (i.hasNext()) {
+    		kk = i.next();
+    		logger.info("redisHashTest2. kk=" + kk + "  v=" + redisRoutingMap.get(kk));
+    	}
+
+    }
+    
+    @RequestMapping("/public/void.do")
     public void empty() {
 
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -121,17 +189,21 @@ public class UserController {
     	logger.info("void.do user: " + authentication.getName());
     	//    	System.out.println("void.do start.");
     	
-    	String k = "myKey";
-    	String v = null;
-    	v = redisTemplate.opsForValue().get(k);
-    	if(v!=null) {
-    		v=v+".";
-    	}
-    	else {
-    		v=".";
-    	}
-    	redisTemplate.opsForValue().set(k, v);
+//    	redisValueTest();
+    	redisHashTest();
+    	
     	logger.info("void.do end");
+    }
+    
+    @RequestMapping("/public/void2.do")
+    public void empty2() {
+
+
+//    	redisValueTest();
+//    	redisHashTest();
+    	redisHashTest2();
+    	
+    	logger.info("void2.do end");
     }
     
     @RequestMapping("/count.do")
