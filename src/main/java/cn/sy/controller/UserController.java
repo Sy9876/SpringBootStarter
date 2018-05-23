@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisMap;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,11 @@ public class UserController {
 		String k = "shardRule:shop";
 		redisRoutingMap = new DefaultRedisMap<>(k, stringRedisTemplate);
 	}
+	
+	
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
 	
     @RequestMapping("/login.do")
     public User login(
@@ -205,6 +211,16 @@ public class UserController {
     	
     	logger.info("void2.do end");
     }
+    
+    
+    @RequestMapping("/public/sendMsg.do")
+    public void sendMsg() {
+
+    	kafkaTemplate.send("myTopic", "foo1");
+    	
+    	logger.info("sendMsg.do end");
+    }
+    
     
     @RequestMapping("/count.do")
     public int count() {
