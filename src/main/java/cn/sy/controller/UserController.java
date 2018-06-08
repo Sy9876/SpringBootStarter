@@ -1,5 +1,6 @@
 package cn.sy.controller;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,10 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisMap;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.converter.KafkaMessageHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.sy.dao.UserDao;
 import cn.sy.domain.MyUserDetails;
 import cn.sy.domain.User;
+import cn.sy.dto.DemoKafkaDto;
 
 
 @RestController
@@ -44,7 +50,7 @@ public class UserController {
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	@Resource(name="stringRedisTemplate")
 	private HashOperations<String, String, String> hashOps;
 	
@@ -64,6 +70,12 @@ public class UserController {
 	
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, Integer> intKafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, DemoKafkaDto> dtoKafkaTemplate;
 	
 	
     @RequestMapping("/login.do")
@@ -219,6 +231,31 @@ public class UserController {
     	kafkaTemplate.send("myTopic", "foo1");
     	
     	logger.info("sendMsg.do end");
+    }
+    
+    @RequestMapping("/public/sendInt.do")
+    public void sendInt(int count) {
+
+    	intKafkaTemplate.send("myTopic", count);
+    	
+    	logger.info("sendInt.do end");
+    }
+    
+    
+    @RequestMapping("/public/sendDto.do")
+    public void sendDto() {
+
+    	DemoKafkaDto dto = new DemoKafkaDto();
+    	
+    	Map<String, Object> headers = new HashMap<String, Object>();
+    	headers.put(KafkaHeaders.TOPIC, "myTopic");
+    	headers.put("myCustomHeader", "abc");
+    	Message<DemoKafkaDto> msg = new GenericMessage<DemoKafkaDto>(dto, headers);
+
+		logger.info("sendDto.do msg: " + msg);
+    	dtoKafkaTemplate.send(msg);
+    	
+    	logger.info("sendDto.do end");
     }
     
     
