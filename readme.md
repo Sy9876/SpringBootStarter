@@ -102,6 +102,16 @@ set C=curl -i --cookie cookiejar.txt --cookie-jar cookiejar.txt -H "Accept: appl
 
 %C%  "http://localhost:8080/user.do?name=sy"
 
+
+
+
+%C%  "http://localhost:8080/public/sendMsg.do"
+
+%C%  "http://localhost:8080/public/sendInt.do?count=10"
+
+%C%  "http://localhost:8080/public/sendDto.do"
+
+
 ```
 
 ## REST API present sessionid in X-Auth-Token
@@ -124,3 +134,78 @@ set X_AUTH_TOKEN=
 
 
 ```
+
+
+
+## kafka commands
+
+```
+cd %KAFKA_HOME%
+
+set BROKERLIST=127.0.0.1:9092
+set ZKLIST=127.0.0.1:2181
+set TOPIC=myTopic
+
+bin\windows\kafka-topics.bat --zookeeper %ZKLIST% --list
+
+bin\windows\kafka-topics.bat --zookeeper %ZKLIST% --create --topic %TOPIC% --partitions 1 --replication-factor 1
+
+bin\windows\kafka-topics.bat --zookeeper %ZKLIST% --describe
+
+
+bin\windows\kafka-run-class.bat kafka.admin.ConsumerGroupCommand --bootstrap-server %BROKERLIST% --list
+
+
+bin\windows\kafka-console-producer.bat --broker-list %BROKERLIST% --topic %TOPIC%
+
+# bin\windows\kafka-console-consumer.bat --zookeeper %ZKLIST% --topic %TOPIC% --from-beginning
+bin\windows\kafka-console-consumer.bat --bootstrap-server %BROKERLIST% --topic %TOPIC% --from-beginning
+
+set KAFKA_LOG=kafka-logs\myTopic-0\00000000000000000000.log
+#set KAFKA_LOG=kafka-logs\myTopic-0\00000000000000000000.index
+bin\windows\kafka-run-class.bat kafka.tools.DumpLogSegments --print-data-log --files %KAFKA_LOG%
+
+
+```
+
+
+## 测试结果
+
+producer设置
+spring.kafka.producer.valueSerializer=org.springframework.kafka.support.serializer.JsonSerializer
+后，可用通过
+
+```
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, Integer> intKafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, DemoKafkaDto> dtoKafkaTemplate;
+	
+```
+
+发送各种类型的数据。
+
+consumer不做特殊设置，使用String参数的listener即可接收
+
+```
+@KafkaListener(topics = "myTopic", groupId="g1")
+	@KafkaHandler()
+	public void listen3(String payload) throws Exception { 
+		logger.info("listen3 myTopic payload: " + payload);
+	}
+```
+
+得到：
+listen3 myTopic payload: "foo1"
+listen3 myTopic payload: 10
+listen3 myTopic payload: {"v1":null,"v2":null,"v3":0,"v4":null}
+
+
+producer不使用JsonSerializer的话，无法发送String以外的消息
+
+
+

@@ -11,8 +11,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
-@Configuration
-@EnableKafka
+//@Configuration
+//@EnableKafka
 public class KafkaConfig {
 
 	
@@ -30,27 +30,27 @@ public class KafkaConfig {
 //	}
 //	
 //	
-	@Autowired
-	private ConsumerFactory<String, String> consumerFactory;
-	
-	@Bean
-	public KafkaListenerContainerFactory<?> kafkaJsonListenerContainerFactory() {
-		ConcurrentKafkaListenerContainerFactory<String, String> factory =
-				new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory);
-		factory.setMessageConverter(new StringJsonMessageConverter());
-		return factory;
-	}
-	
-	
-	@Autowired
-	private ProducerFactory<String, ?> producerFactory;
-	
-	@Bean
-	public KafkaTemplate<String, ?> kafkaTemplate() {
-		KafkaTemplate<String, ?> template = new KafkaTemplate<>(producerFactory);
-		template.setMessageConverter(new StringJsonMessageConverter());
-		return template;
-	}
+//	@Autowired
+//	private ConsumerFactory<String, String> consumerFactory;
+//	
+//	@Bean
+//	public KafkaListenerContainerFactory<?> kafkaJsonListenerContainerFactory() {
+//		ConcurrentKafkaListenerContainerFactory<String, String> factory =
+//				new ConcurrentKafkaListenerContainerFactory<>();
+//		factory.setConsumerFactory(consumerFactory);
+//		factory.setMessageConverter(new StringJsonMessageConverter());
+//		return factory;
+//	}
+//	
+//	
+//	@Autowired
+//	private ProducerFactory<String, ?> producerFactory;
+//	
+//	@Bean
+//	public KafkaTemplate<String, ?> kafkaTemplate() {
+//		KafkaTemplate<String, ?> template = new KafkaTemplate<>(producerFactory);
+//		template.setMessageConverter(new StringJsonMessageConverter());
+//		return template;
+//	}
 	
 }
