@@ -1,8 +1,15 @@
 package cn.sy.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import javax.annotation.PostConstruct;
+
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +69,15 @@ public class KafkaController {
     public void sendDto() {
 
     	DemoKafkaDto dto = new DemoKafkaDto();
+    	dto.setV1(UUID.randomUUID().toString());
+    	dto.setV2(null);
+    	dto.setV3(0);
+    	dto.setV4(new Date());
     	
     	Map<String, Object> headers = new HashMap<String, Object>();
     	headers.put(KafkaHeaders.TOPIC, "myTopic");
-    	headers.put("myCustomHeader", "abc");
+//    	headers.put("myCustomHeader", "abc");
+    	headers.put("PayLoadType", DemoKafkaDto.class.getName());
     	Message<DemoKafkaDto> msg = new GenericMessage<DemoKafkaDto>(dto, headers);
 
 		logger.info("sendDto.do msg: " + msg);
@@ -74,7 +86,33 @@ public class KafkaController {
     	logger.info("sendDto.do end");
     }
     
-    
+    @RequestMapping("/public/sendRecord.do")
+    public void sendRecord() {
+
+    	DemoKafkaDto dto = new DemoKafkaDto();
+    	dto.setV1(UUID.randomUUID().toString());
+    	dto.setV2("sendRecord");
+    	dto.setV3(0);
+    	dto.setV4(new Date());
+    	
+//    	Map<String, Object> headers = new HashMap<String, Object>();
+//    	headers.put(KafkaHeaders.TOPIC, "myTopic");
+////    	headers.put("myCustomHeader", "abc");
+//    	headers.put("PayLoadType", DemoKafkaDto.class.getName());
+//    	Message<DemoKafkaDto> msg = new GenericMessage<DemoKafkaDto>(dto, headers);
+
+    	RecordHeaders headers = new RecordHeaders();
+    	headers.add("PayLoadType", org.apache.kafka.common.utils.Utils.utf8(DemoKafkaDto.class.getName()));
+    	// String topic, Integer partition, K key, V value,  Iterable<Header> headers
+    	ProducerRecord<String, DemoKafkaDto> record = new ProducerRecord<String, DemoKafkaDto>(
+    			"myTopic", null, null, dto, headers);
+    	
+		logger.info("sendDto.do record: " + record);
+    	dtoKafkaTemplate.send(record);
+    	
+    	logger.info("sendDto.do end");
+    }
+
     
     @ExceptionHandler(value=Exception.class)
     @ResponseStatus

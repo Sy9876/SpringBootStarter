@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import cn.sy.dto.DemoKafkaDto;
 
 @Component
-@KafkaListener(topics = "myTopic", groupId="g1")
-// ,containerFactory = "kafkaJsonListenerContainerFactory"
+@KafkaListener(topics = "myTopic", groupId="g1"
+ ,containerFactory = "kafkaJsonListenerContainerFactory"
+)
 public class MyKafkaListener {
 	private static Logger logger = LoggerFactory.getLogger(KafkaListener.class);
 
@@ -62,12 +63,12 @@ public class MyKafkaListener {
 //	}
     
 
-//	@KafkaHandler()
-//	public void listen(DemoKafkaDto msg) throws Exception { 
-//	
-//		logger.info("listen myTopic DemoKafkaDto msg: " + msg.toString());
-//
-//	}
+	@KafkaHandler()
+	public void listen(DemoKafkaDto msg) throws Exception { 
+	
+		logger.info("listen myTopic DemoKafkaDto msg: " + msg.toString());
+
+	}
 
 	@KafkaHandler()
 	public void listen(ConsumerRecord<String, String> cr) throws Exception { 

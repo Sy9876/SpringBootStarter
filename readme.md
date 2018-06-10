@@ -111,6 +111,8 @@ set C=curl -i --cookie cookiejar.txt --cookie-jar cookiejar.txt -H "Accept: appl
 
 %C%  "http://localhost:8080/public/sendDto.do"
 
+%C%  "http://localhost:8080/public/sendRecord.do"
+
 
 ```
 
@@ -131,7 +133,6 @@ set X_AUTH_TOKEN=
 %CX% -H "X-Auth-Token: %X_AUTH_TOKEN%" "http://localhost:8080/user.do?name=sy"
 
 %CX% -H "X-Auth-Token: %X_AUTH_TOKEN%" "http://localhost:8080/menus.do?name=sy"
-
 
 ```
 

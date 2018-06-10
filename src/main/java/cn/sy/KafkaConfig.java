@@ -11,7 +11,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
-//@Configuration
+import cn.sy.kafka.MyStringJsonMessageConverter;
+
+@Configuration
 //@EnableKafka
 public class KafkaConfig {
 
@@ -30,17 +32,20 @@ public class KafkaConfig {
 //	}
 //	
 //	
-//	@Autowired
-//	private ConsumerFactory<String, String> consumerFactory;
-//	
-//	@Bean
-//	public KafkaListenerContainerFactory<?> kafkaJsonListenerContainerFactory() {
-//		ConcurrentKafkaListenerContainerFactory<String, String> factory =
-//				new ConcurrentKafkaListenerContainerFactory<>();
-//		factory.setConsumerFactory(consumerFactory);
+	@Autowired
+	private ConsumerFactory<String, String> consumerFactory;
+	
+	@Bean
+	public KafkaListenerContainerFactory<?> kafkaJsonListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, String> factory =
+				new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory);
 //		factory.setMessageConverter(new StringJsonMessageConverter());
-//		return factory;
-//	}
+		factory.setMessageConverter(new MyStringJsonMessageConverter());
+		
+		
+		return factory;
+	}
 //	
 //	
 //	@Autowired
