@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.apache.kafka.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.sy.dto.Demo2KafkaDto;
 import cn.sy.dto.DemoKafkaDto;
+import cn.sy.kafka.KafkaUtil;
 
 
 @RestController
@@ -36,6 +39,8 @@ public class KafkaController {
 		logger.info("PostConstruct. init ");
 	}
 	
+	@Autowired
+	private KafkaUtil kafkaUtil;
 	
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -45,6 +50,9 @@ public class KafkaController {
 	
 	@Autowired
 	private KafkaTemplate<String, DemoKafkaDto> dtoKafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, Demo2KafkaDto> dto2KafkaTemplate;
 	
 	    
     
@@ -74,17 +82,60 @@ public class KafkaController {
     	dto.setV3(0);
     	dto.setV4(new Date());
     	
-    	Map<String, Object> headers = new HashMap<String, Object>();
-    	headers.put(KafkaHeaders.TOPIC, "myTopic");
-//    	headers.put("myCustomHeader", "abc");
-    	headers.put("PayLoadType", DemoKafkaDto.class.getName());
-    	Message<DemoKafkaDto> msg = new GenericMessage<DemoKafkaDto>(dto, headers);
+//    	Map<String, Object> headers = new HashMap<String, Object>();
+//    	headers.put(KafkaHeaders.TOPIC, "myTopic");
+////    	headers.put("myCustomHeader", "abc");
+//    	headers.put("PayLoadType", DemoKafkaDto.class.getName());
+//    	Message<DemoKafkaDto> msg = new GenericMessage<DemoKafkaDto>(dto, headers);
+//
+//		logger.info("sendDto.do msg: " + msg);
+//    	dtoKafkaTemplate.send(msg);
+    	
+    	RecordHeaders headers = new RecordHeaders();
+    	headers.add("PayLoadType", Utils.utf8(DemoKafkaDto.class.getName()));
+    	ProducerRecord<String, DemoKafkaDto> record = new ProducerRecord<String, DemoKafkaDto>(
+    			"myTopic", null, null, dto, headers);
 
-		logger.info("sendDto.do msg: " + msg);
-    	dtoKafkaTemplate.send(msg);
+    	logger.info("sendDto.do record: " + record);
+    	dtoKafkaTemplate.send(record);
+    	
     	
     	logger.info("sendDto.do end");
     }
+    
+    
+    @RequestMapping("/public/sendDto2.do")
+    public void sendDto2() {
+
+    	Demo2KafkaDto dto = new Demo2KafkaDto();
+    	dto.setId(UUID.randomUUID().toString());
+    	dto.setFrom("from");
+    	dto.setTo("to");
+    	dto.setTs(new Date());
+    	dto.setPayloadStr("sendDto2.do");
+    	
+    	RecordHeaders headers = new RecordHeaders();
+    	headers.add("PayLoadType", Utils.utf8(Demo2KafkaDto.class.getName()));
+    	headers.add("From", Utils.utf8("B"));
+    	headers.add("To", Utils.utf8("S"));
+    	// String topic, Integer partition, K key, V value,  Iterable<Header> headers
+    	ProducerRecord<String, Demo2KafkaDto> record = new ProducerRecord<String, Demo2KafkaDto>(
+    			"myTopic", null, null, dto, headers);
+    	
+//		logger.info("sendDto2.do record: " + record);
+//		dto2KafkaTemplate.send(record);
+    	
+    	logger.info("sendDto2.do use kafkaUtil send dto: " + dto);
+    	kafkaUtil.send("myTopic", dto);
+
+    	
+//		logger.info("sendDto2.do dto: " + dto);
+//    	dto2KafkaTemplate.send("myTopic", dto);
+    	
+    	logger.info("sendDto2.do end");
+    }
+    
+    
     
     @RequestMapping("/public/sendRecord.do")
     public void sendRecord() {
@@ -113,6 +164,14 @@ public class KafkaController {
     	logger.info("sendDto.do end");
     }
 
+    @RequestMapping("/public/loadClass.do")
+    public String loadClass(String classStr) throws ClassNotFoundException {
+
+    	Class clazz = Class.forName(classStr);
+    	
+    	return clazz.getName();
+    }
+    
     
     @ExceptionHandler(value=Exception.class)
     @ResponseStatus

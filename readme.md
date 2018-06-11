@@ -167,6 +167,15 @@ set KAFKA_LOG=kafka-logs\myTopic-0\00000000000000000000.log
 bin\windows\kafka-run-class.bat kafka.tools.DumpLogSegments --print-data-log --files %KAFKA_LOG%
 
 
+
+bin\windows\kafka-run-class.bat kafka.admin.ConsumerGroupCommand --bootstrap-server %BROKERLIST% --offsets --describe --group g1
+Note: This will not show information about old Zookeeper-based consumers.
+Consumer group 'g1' has no active members.
+
+TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+myTopic         0          10237           11353           1116            -               -               -
+
+
 ```
 
 

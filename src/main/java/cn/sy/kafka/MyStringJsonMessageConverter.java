@@ -10,6 +10,7 @@ import org.springframework.kafka.support.converter.ConversionException;
 import org.springframework.kafka.support.converter.MessagingMessageConverter;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -62,10 +63,11 @@ public class MyStringJsonMessageConverter extends MessagingMessageConverter {
 			header = it.next();
 			typeStr = Utils.utf8(header.value());
 			try {
-				clazz = Class.forName(typeStr);
+//				clazz = Class.forName(typeStr);
+				clazz = ClassUtils.forName(typeStr, null);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-				throw new RuntimeException(e);
+//				throw new RuntimeException(e);
 			}
 		}
 		JavaType javaType = TypeFactory.defaultInstance().constructType(type);
@@ -77,7 +79,13 @@ public class MyStringJsonMessageConverter extends MessagingMessageConverter {
 		
 		if (value instanceof String) {
 			try {
-				return this.objectMapper.readValue((String) value, javaType);
+				if(javaType.isJavaLangObject()) {
+					// javaType is java.lang.Object. return String
+					return value;
+				}
+				else {
+					return this.objectMapper.readValue((String) value, javaType);
+				}
 			}
 			catch (IOException e) {
 				throw new ConversionException("Failed to convert from JSON", e);
