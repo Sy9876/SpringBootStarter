@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class LoggingAopTest {
 	private static Logger logger = Logger.getLogger(LoggingAopTest.class);
 
-	@Around("execution(* cn.sy.controller.UserController.*(..))")
+	@Around("execution(* cn.sy.controller.*.*(..))")
 	public Object logServiceAccess(ProceedingJoinPoint joinPoint) {
 		Object rtn = null;
 		try {
